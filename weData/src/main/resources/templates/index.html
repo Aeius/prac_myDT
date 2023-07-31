@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+</head>
+<body>
+    <h1>index page</h1>
+    <div>
+        first<input type="radio" name="scope" value="first">
+        second<input type="radio" name="scope" value="second">
+        <button type="button" id="createToken">토큰생성</button>
+    </div>
+    <div>
+        <input type="text" id="org_code"/>
+    </div>
+    <div>
+        <input type="text" id="token"/>
+    </div>
+    <button type="button" id="callAPI">API 호출</button>
+    <div id="result"></div>
+
+    
+    <script>
+        $('#createToken').on('click',function(){
+            var ajax = $.ajax({
+                type: 'GET',
+                url : 'http://localhost:8081/oauth/token?scope='+ $("input[name='scope']:checked").val()
+            });
+
+            ajax.done(function(res){
+                var sendData = {
+                    org_code : res.split('|')[0],
+                    token : res.split('|')[1]
+                }
+                $.ajax({
+                    type: 'POST',
+                    url : 'http://localhost:8080/oauth/token',
+                    data: JSON.stringify(sendData),
+                    contentType: 'application/json; charset=utf-8',            
+                })
+                $('#org_code').val(sendData.org_code.replaceAll("\"", ""));
+                $('#token').val(sendData.token);
+            });
+        })
+
+        $('#callAPI').on('click', function(){
+            $.ajax({
+                type: 'GET',
+                url : 'http://localhost:8081/openapi/'+$("input[name='scope']:checked").val(),
+                headers: {
+                    'Authorization': 'Bearer ' + $('#token').val(),
+                    'OrgCode' : $('#org_code').val()
+                },
+                dataType: 'json',
+                success: function(data){
+                    $('#result').html(JSON.stringify(data));
+                }
+            })
+        })
+        
+    </script>
+</body>
+</html>
