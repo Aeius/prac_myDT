@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-PublicDataApplication<publicData>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "org.publicData.PublicDataApplication",
+            "projectName": "publicData",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-WeDataApplication<weData>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.weData.WeDataApplication",
+            "projectName": "weData",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
