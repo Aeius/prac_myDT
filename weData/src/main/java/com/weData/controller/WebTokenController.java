@@ -5,10 +5,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.weData.entity.WebToken;
 import com.weData.repository.WebTokenRepository;
+import com.weData.util.OTP;
 
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -27,6 +29,15 @@ public class WebTokenController {
         .web_token(payload.get("token"))
         .build());
         return "redirect:/";
+    }
+
+    @GetMapping("/OTP")
+    public String otp() throws Exception{
+        String code = OTP.create();
+        System.out.println("Created OTP : " + code);
+        System.out.println("Verify OTP : " + OTP.verify(code));
+        System.out.println("Verify OTP : " + OTP.verify(code+1));
+        return "";
     }
     
 }

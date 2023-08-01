@@ -8,7 +8,8 @@
             "mainClass": "org.publicData.PublicDataApplication",
             "projectName": "publicData",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=51362 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=publicData"
         },
         {
             "type": "java",
@@ -17,6 +18,16 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "com.weData.WeDataApplication",
             "projectName": "weData",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-SingleApplication<single_sign_on>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.single_sign_on.SingleApplication",
+            "projectName": "single_sign_on",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         }
