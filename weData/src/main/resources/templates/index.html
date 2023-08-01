@@ -9,9 +9,19 @@
 <body>
     <h1>index page</h1>
     <div>
-        first<input type="radio" name="scope" value="first">
-        second<input type="radio" name="scope" value="second">
+        first<input type="radio" name="scope" value="first" id="first">
+        second<input type="radio" name="scope" value="second" id="second">
         <button type="button" id="createToken">토큰생성</button>
+    </div>
+    <div>
+        이름<input type="text" id="name" />
+    </div>
+    <div>
+        주민번호<input type="text" id="num" />-<input type="text" id="num2" />
+    </div>
+    <div>
+        CI  <input type="text" id="CI" />
+        <button type="button" id="createCI">CI생성</button>
     </div>
     <div>
         <input type="text" id="org_code"/>
@@ -35,16 +45,34 @@
                     org_code : res.split('|')[0],
                     token : res.split('|')[1]
                 }
+
                 $.ajax({
                     type: 'POST',
                     url : 'http://localhost:8080/oauth/token',
                     data: JSON.stringify(sendData),
-                    contentType: 'application/json; charset=utf-8',            
+                    contentType: 'application/json; charset=utf-8',
                 })
                 $('#org_code').val(sendData.org_code.replaceAll("\"", ""));
                 $('#token').val(sendData.token);
             });
-        })
+        });
+
+        $('#createCI').on('click', function() {
+            const params = {
+                name : $("#name").val(),
+                num : $("#num").val(),
+                num2 : $("#num2").val()
+            }
+            $.ajax({
+                type: 'POST',
+                url : 'http://localhost:8082/user/sign',
+                data: JSON.stringify(params),
+                contentType: 'application/json; charset=utf-8',
+                success: function(data){
+                    $('#CI').val(data);
+                }
+            })
+        });
 
         $('#callAPI').on('click', function(){
             $.ajax({
@@ -59,8 +87,9 @@
                     $('#result').html(JSON.stringify(data));
                 }
             })
-        })
-        
+        });
+
+
     </script>
 </body>
 </html>

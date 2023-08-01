@@ -11,7 +11,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 @Service
@@ -21,6 +20,10 @@ public class JWTService {
     private SubTokenRepository subTokenRepository;
 
     Algorithm algorithm = Algorithm.HMAC256("D!Jsk4qw3ej");
+
+    public JWTService(SubTokenRepository subTokenRepository) {
+        this.subTokenRepository = subTokenRepository;
+    }
 
     // 토큰 생성
     public String createToken(String scope){
