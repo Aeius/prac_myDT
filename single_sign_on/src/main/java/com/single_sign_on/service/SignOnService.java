@@ -1,17 +1,19 @@
 package com.single_sign_on.service;
 
-import com.single_sign_on.domain.SignOn;
-import com.single_sign_on.repositroy.SignOnRepository;
-import org.apache.tomcat.util.codec.binary.Base64;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.apache.tomcat.util.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.single_sign_on.domain.SignOn;
+import com.single_sign_on.repositroy.SignOnRepository;
 
 @Service
 public class SignOnService {
@@ -42,4 +44,8 @@ public class SignOnService {
         return Base64.encodeBase64String(hash);
     }
 
+    public boolean verify(Map<String, String> data) {
+        if(signOnRepository.verify(data.get("ci"), data.get("name")) == null) return false;
+        return true;
+    }
 }

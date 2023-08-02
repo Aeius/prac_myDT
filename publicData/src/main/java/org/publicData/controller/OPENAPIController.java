@@ -1,12 +1,15 @@
 package org.publicData.controller;
 
 import java.io.IOException;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.publicData.service.JWTService;
 import org.publicData.service.OPENAPIService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,11 +25,11 @@ class OPENAPIController {
     @Autowired
     private OPENAPIService openapiService;
 
-    @GetMapping("/first")
-    public String openApi_1(HttpServletRequest request) throws IOException{
+    @PostMapping("/first")
+    public String openApi_1(HttpServletRequest request, @RequestBody Map<String, String> map) throws IOException{
         String token = request.getHeader("Authorization").replace("Bearer ", "");
-        String org_code = request.getHeader("OrgCode");
-        if(!jwtService.validateToken(org_code, token)) return "{\"error\" : \"유효하지 않은 토큰입니다.\"}";
+        
+        if(!jwtService.validateToken(map.get("org_code"), token)) return "{\"error\" : \"유효하지 않은 토큰입니다.\"}";
 
         DecodedJWT decodedJWT = jwtService.decodeToken(token);
         String scope = decodedJWT.getClaim("scope").toString().replaceAll("\"", "");
@@ -40,11 +43,11 @@ class OPENAPIController {
         return openapiService.xmlToJson(xml);
     }
 
-    @GetMapping("/second")
-    public String open_api2(HttpServletRequest request) throws IOException{
+    @PostMapping("/second")
+    public String open_api2(HttpServletRequest request, @RequestBody Map<String, String> map) throws IOException{
         String token = request.getHeader("Authorization").replace("Bearer ", "");
-        String org_code = request.getHeader("OrgCode");
-        if(!jwtService.validateToken(org_code, token)) return "{\"error\" : \"유효하지 않은 토큰입니다.\"}";
+        
+        if(!jwtService.validateToken(map.get("org_code"), token)) return "{\"error\" : \"유효하지 않은 토큰입니다.\"}";
 
         DecodedJWT decodedJWT = jwtService.decodeToken(token);
         String scope = decodedJWT.getClaim("scope").toString().replaceAll("\"", "");

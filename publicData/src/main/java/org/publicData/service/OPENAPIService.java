@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class OPENAPIService {
-    
+
     // 부산 건설 공사 현황 Api 호출
     public String apicall(String page) throws IOException{
         StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/6260000/BusanCnstrWorkInfoService/getCnstrWorkInfo"); /*URL*/

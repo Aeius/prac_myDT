@@ -7,7 +7,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 </head>
 <body>
-    <h1>index page</h1>
+    <h3>정보 주체 CI 생성</h3>
     <div>
         이름<input type="text" id="name" />
     </div>
@@ -16,47 +16,56 @@
     </div>
     <div>
         CI  <input type="text" id="CI" />
-        <button type="button" id="createCI">CI생성</button>
+        <button type="button" id="createCI">CI생성</button><br>
+        <button type="button" id="ci_verify">검증</button>
+        <div id="ci_verify_result"></div>
+    </div>
+    <hr>
+    <h3>사업자, 기관코드 등록 및 검증</h3>
     <div>
-        first<input type="radio" name="scope" value="first" id="first">
+        org_code : <input type="text" name="org_code" id="org_code" value="asd123dwe"> <br>
+        <button type="button" id="client">클라이언트 생성</button><br>
+        client_id : <input type="text" name="client_id" id="client_id"><br>
+        client_password : <input type="text" name="client_password" id="client_password"><br>
+        <button type="button" id="client_verify">검증</button>
+        <div id="client_verify_result"></div>
+    </div>
+    <hr>
+    <h3>접근토큰 생성</h3>
+    <div>
+        first<input type="radio" name="scope" value="first" id="first" checked>
         second<input type="radio" name="scope" value="second" id="second">
         <button type="button" id="createToken">토큰생성</button>
-    </div>
-    </div>
-    <div>
-        <input type="text" id="org_code"/>
     </div>
     <div>
         <input type="text" id="token"/>
     </div>
+    <hr>
+    <h3>정보제공 API 호출</h3>
     <button type="button" id="callAPI">API 호출</button>
     <div id="result"></div>
 
     
     <script>
+        // 접근토큰 생성
         $('#createToken').on('click',function(){
             var ajax = $.ajax({
                 type: 'GET',
                 url : 'http://localhost:8081/oauth/token?scope='+ $("input[name='scope']:checked").val()
             });
-
-            ajax.done(function(res){
-                var sendData = {
-                    org_code : res.split('|')[0],
-                    token : res.split('|')[1]
-                }
-
+            // web에서 생성된 토큰 저장
+            ajax.done(function(response){
                 $.ajax({
                     type: 'POST',
                     url : 'http://localhost:8080/oauth/token',
-                    data: JSON.stringify(sendData),
+                    data: JSON.stringify(response),
                     contentType: 'application/json; charset=utf-8',
                 })
-                $('#org_code').val(sendData.org_code.replaceAll("\"", ""));
-                $('#token').val(sendData.token);
+                $('#token').val(response);
             });
         });
 
+        // 정보 주체 CI 값 생성
         $('#createCI').on('click', function() {
             const params = {
                 name : $("#name").val(),
@@ -74,14 +83,33 @@
             })
         });
 
+        // 정보 주체 CI 값 검증
+        $('#ci_verify').on('click', function() {
+            var sendData = {
+                name : $('#name').val(),
+                ci : $('#CI').val()
+            }
+            $.ajax({
+                type: 'POST',
+                url : 'http://localhost:8082/user/verify',
+                data: JSON.stringify(sendData),
+                contentType: 'application/json; charset=utf-8',
+                success: function(result){
+                    $('#ci_verify_result').html("결과 : " + result);
+                }
+            })
+        });
+
+        // 정보제공 API 호출
         $('#callAPI').on('click', function(){
             $.ajax({
-                type: 'GET',
+                type: 'POST',
                 url : 'http://localhost:8081/openapi/'+$("input[name='scope']:checked").val(),
                 headers: {
                     'Authorization': 'Bearer ' + $('#token').val(),
-                    'OrgCode' : $('#org_code').val()
                 },
+                data: JSON.stringify({org_code: $('#org_code').val()}),
+                contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
                 success: function(data){
                     $('#result').html(JSON.stringify(data));
@@ -89,6 +117,30 @@
             })
         });
 
+        // 사업자, 기관코드 추가
+        $('#client').on('click', function() {
+            $.ajax({
+                type: 'POST',
+                url : 'http://localhost:8081/oauth/client',
+                data: JSON.stringify({org_code: $('#org_code').val()}),
+                contentType: 'application/json; charset=utf-8',
+                success: function(data){
+                    $('#client_id').val(data.client_id);
+                    $('#client_password').val(data.client_password);
+                }
+            })
+        });
+
+        // 사업자, 기관코드 검증
+        $('#client_verify').on('click',function() {
+            $.ajax({
+                type: 'GET',
+                url : `http://localhost:8081/oauth/client?org_code=${$('#org_code').val()}&client_id=${$('#client_id').val()}&client_password=${$('#client_password').val()}`,
+                success: function(result){
+                    $('#client_verify_result').html("결과 : " + result);
+                }
+            })
+        });
 
     </script>
 </body>

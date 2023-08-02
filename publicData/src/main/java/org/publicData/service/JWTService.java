@@ -21,16 +21,12 @@ public class JWTService {
 
     Algorithm algorithm = Algorithm.HMAC256("D!Jsk4qw3ej");
 
-    public JWTService(SubTokenRepository subTokenRepository) {
-        this.subTokenRepository = subTokenRepository;
-    }
-
     // 토큰 생성
-    public String createToken(String scope){
-        String org_code = "ZADEV0000";
+    public String createToken(String org_code, String scope){
         String token = JWT.create()
-        .withIssuer("subAPI")
-        .withClaim("org_code", org_code)
+        .withIssuer("정보제공자") // iss
+        .withAudience(org_code) // aud
+        .withJWTId(org_code + "JTI") // jti
         .withClaim("scope", scope)
         .withExpiresAt(new Date(System.currentTimeMillis() + 100*60))
         .sign(algorithm);
@@ -38,9 +34,19 @@ public class JWTService {
         return token;
     }
 
+    // 토큰 갱신
+    public String modifyToken(){
+        return "";
+    }
+
+    // 토큰 폐기
+    public void deleteToken() {
+
+    }
+
     // 디코딩
     public DecodedJWT decodeToken(String encodeToken) throws TokenExpiredException {
-        JWTVerifier jwtVerifier = JWT.require(algorithm).withIssuer("subAPI").build();
+        JWTVerifier jwtVerifier = JWT.require(algorithm).withIssuer("정보제공자").build();
         DecodedJWT decodedJWT = jwtVerifier.verify(encodeToken);
         return decodedJWT;
     }
