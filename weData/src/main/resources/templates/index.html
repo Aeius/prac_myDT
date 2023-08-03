@@ -23,7 +23,7 @@
     <hr>
     <h3>사업자, 기관코드 등록 및 검증</h3>
     <div>
-        org_code : <input type="text" name="org_code" id="org_code" value="asd123dwe"> <br>
+        org_code : <input type="text" name="org_code" id="org_code" value="publicData"> <br>
         <button type="button" id="client">클라이언트 생성</button><br>
         client_id : <input type="text" name="client_id" id="client_id"><br>
         client_password : <input type="text" name="client_password" id="client_password"><br>
@@ -31,11 +31,19 @@
         <div id="client_verify_result"></div>
     </div>
     <hr>
-    <h3>접근토큰 생성</h3>
+    <h3>접근토큰</h3>
     <div>
+        <div>
+        scope설정<br>
         first<input type="radio" name="scope" value="first" id="first" checked>
         second<input type="radio" name="scope" value="second" id="second">
-        <button type="button" id="createToken">토큰생성</button>
+        </div>
+        <div>
+            <button type="button" id="createToken">토큰생성</button>
+            <button type="button" id="modifyToken">토큰갱신</button>
+            <button type="button" id="deleteToken">토큰폐기</button>
+        </div>
+        <div id="token_create_result"></div>
     </div>
     <div>
         <input type="text" id="token"/>
@@ -51,17 +59,25 @@
         $('#createToken').on('click',function(){
             var ajax = $.ajax({
                 type: 'GET',
-                url : 'http://localhost:8081/oauth/token?scope='+ $("input[name='scope']:checked").val()
+                url : 'http://localhost:8081/oauth/token?scope='+ $("input[name='scope']:checked").val() + '&org_code='+$('#org_code').val()
             });
             // web에서 생성된 토큰 저장
             ajax.done(function(response){
-                $.ajax({
-                    type: 'POST',
-                    url : 'http://localhost:8080/oauth/token',
-                    data: JSON.stringify(response),
-                    contentType: 'application/json; charset=utf-8',
-                })
-                $('#token').val(response);
+                if(response.result === 'success'){
+                    var sendData = {
+                        org_code : $('#org_code').val(),
+                        toekn: response.token
+                    }
+                    $.ajax({
+                        type: 'POST',
+                        url : 'http://localhost:8080/oauth/token',
+                        data: JSON.stringify(sendData),
+                        contentType: 'application/json; charset=utf-8',
+                    })
+                    $('#token').val(response.token);
+                    
+                } 
+                $('#token_create_result').html(response.msg);
             });
         });
 

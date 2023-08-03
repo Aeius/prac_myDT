@@ -2,6 +2,7 @@ package org.publicData.service;
 
 import java.util.Date;
 
+import org.publicData.TokenEnum;
 import org.publicData.entity.SubToken;
 import org.publicData.repository.SubTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +25,9 @@ public class JWTService {
     // 토큰 생성
     public String createToken(String org_code, String scope){
         String token = JWT.create()
-        .withIssuer("정보제공자") // iss
-        .withAudience(org_code) // aud
-        .withJWTId(org_code + "JTI") // jti
+        .withIssuer(TokenEnum.ISSUER) // iss
+        .withAudience(TokenEnum.AUDIENCE) // aud
+        .withJWTId(TokenEnum.JWTID) // jti
         .withClaim("scope", scope)
         .withExpiresAt(new Date(System.currentTimeMillis() + 100*60))
         .sign(algorithm);
@@ -34,19 +35,34 @@ public class JWTService {
         return token;
     }
 
+    // 토큰 중복 체크
+    public boolean isdupToken(String org_code){
+        SubToken token = subTokenRepository.HasTokenByOrgCode(org_code);
+        if(token == null) return false;
+        try {
+            decodeToken(token.getSub_token());
+        } catch (TokenExpiredException e) {
+            return false;
+        }
+        return true;
+    }
+
     // 토큰 갱신
-    public String modifyToken(){
-        return "";
+    public String modifyToken(String org_code, String scope){
+        SubToken entity = subTokenRepository.HasTokenByOrgCode(org_code);
+        String newToken = createToken(org_code, scope);
+        entity.setSub_token(newToken);
+        return newToken;
     }
 
     // 토큰 폐기
-    public void deleteToken() {
-
+    public void deleteToken(String org_code) {
+        subTokenRepository.deleteByOrgCode(org_code);
     }
 
     // 디코딩
     public DecodedJWT decodeToken(String encodeToken) throws TokenExpiredException {
-        JWTVerifier jwtVerifier = JWT.require(algorithm).withIssuer("정보제공자").build();
+        JWTVerifier jwtVerifier = JWT.require(algorithm).withIssuer(TokenEnum.ISSUER).build();
         DecodedJWT decodedJWT = jwtVerifier.verify(encodeToken);
         return decodedJWT;
     }
