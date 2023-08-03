@@ -42,6 +42,7 @@ public class JWTService {
         try {
             decodeToken(token.getSub_token());
         } catch (TokenExpiredException e) {
+            deleteToken(org_code);
             return false;
         }
         return true;

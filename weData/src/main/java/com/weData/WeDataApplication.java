@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class WeDataApplication {
 
 	public static void main(String[] args) {
+		System.out.println("중단점 찍어봤습니다.");
 		SpringApplication.run(WeDataApplication.class, args);
 	}
 

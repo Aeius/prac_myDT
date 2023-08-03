@@ -23,10 +23,12 @@ public class WebTokenController {
     private WebTokenRepository repository;
 
     @PostMapping("/token")
-    public String saveToken(@RequestBody Map<String,String> payload) {
+    public String saveToken(@RequestBody Map<String,String> map) {
+        System.out.println(map.get("org_code"));
+        System.out.println(map.get("token"));
         repository.save(WebToken.builder()
-        .org_code(payload.get("org_code").replaceAll("\"", ""))
-        .web_token(payload.get("token"))
+        .org_code(map.get("org_code").replaceAll("\"", ""))
+        .web_token(map.get("token"))
         .build());
         return "redirect:/";
     }
